@@ -47,13 +47,13 @@ public class TestTourGuideService {
 		tourGuideService.addUser(user);
 		tourGuideService.addUser(user2);
 
-		User retrivedUser = tourGuideService.getUser(user.getUserName());
-		User retrivedUser2 = tourGuideService.getUser(user2.getUserName());
+		User retrievedUser = tourGuideService.getUser(user.getUserName());
+		User retrievedUser2 = tourGuideService.getUser(user2.getUserName());
 
 		tourGuideService.tracker.stopTracking();
 
-		assertEquals(user, retrivedUser);
-		assertEquals(user2, retrivedUser2);
+		assertEquals(user, retrievedUser);
+		assertEquals(user2, retrievedUser2);
 	}
 
 	@Test
