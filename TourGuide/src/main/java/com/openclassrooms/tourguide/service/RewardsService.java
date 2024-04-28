@@ -38,6 +38,7 @@ public class RewardsService {
 	}
 
 	public void calculateRewards(User user) {
+		// Now we work on this because the 2nd tests use this method.
 		CopyOnWriteArrayList<VisitedLocation> userLocations = new CopyOnWriteArrayList<>(user.getVisitedLocations());
 		List<Attraction> attractions = gpsUtil.getAttractions();
 		
