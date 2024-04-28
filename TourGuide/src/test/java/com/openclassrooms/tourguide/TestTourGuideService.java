@@ -13,6 +13,7 @@ import tripPricer.Provider;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,7 +28,8 @@ public class TestTourGuideService {
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		CompletableFuture<VisitedLocation> futureLocation = tourGuideService.trackUserLocation(user);
+		VisitedLocation visitedLocation = futureLocation.join();
 		tourGuideService.tracker.stopTracking();
         assertEquals(visitedLocation.userId, user.getUserId());
 	}
@@ -83,7 +85,8 @@ public class TestTourGuideService {
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		CompletableFuture<VisitedLocation> futureLocation = tourGuideService.trackUserLocation(user);
+		VisitedLocation visitedLocation = futureLocation.join();
 
 		tourGuideService.tracker.stopTracking();
 
@@ -98,7 +101,8 @@ public class TestTourGuideService {
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		CompletableFuture<VisitedLocation> futureLocation = tourGuideService.trackUserLocation(user);
+		VisitedLocation visitedLocation = futureLocation.join();
 
 		List<Attraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
 

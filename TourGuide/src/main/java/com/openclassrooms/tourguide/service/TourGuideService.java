@@ -17,6 +17,7 @@ import tripPricer.TripPricer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
@@ -54,8 +55,12 @@ public class TourGuideService {
 	}
 
 	public VisitedLocation getUserLocation(User user) {
-        return (!user.getVisitedLocations().isEmpty()) ? user.getLastVisitedLocation()
-				: trackUserLocation(user);
+		if (!user.getVisitedLocations().isEmpty()) {
+			return user.getLastVisitedLocation();
+		} else {
+			CompletableFuture<VisitedLocation> futureLocation = trackUserLocation(user);
+			return futureLocation.join();
+		}
 	}
 
 	public User getUser(String userName) {
@@ -81,14 +86,14 @@ public class TourGuideService {
 		return providers;
 	}
 
-	public VisitedLocation trackUserLocation(User user) {
-		//Improve this for performance tests
-		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
-		user.addToVisitedLocations(visitedLocation);
-		rewardsService.calculateRewards(user);
-		return visitedLocation;
+	public CompletableFuture<VisitedLocation> trackUserLocation(User user) {
+		return CompletableFuture.supplyAsync(() -> {
+			VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+			user.addToVisitedLocations(visitedLocation);
+			rewardsService.calculateRewards(user);
+			return visitedLocation;
+		}, executor);
 	}
-
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		TreeMap<Double, Attraction> nearbyAttractionsMap = new TreeMap<>();
 
