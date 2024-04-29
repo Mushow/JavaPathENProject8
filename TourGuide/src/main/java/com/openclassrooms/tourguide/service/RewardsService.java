@@ -43,18 +43,16 @@ public class RewardsService {
 
 	public Future<?> calculateRewards(User user) {
 		return executor.submit(() -> {
-			CopyOnWriteArrayList<VisitedLocation> userLocations = new CopyOnWriteArrayList<>(user.getVisitedLocations());
+			List<VisitedLocation> userLocations = new CopyOnWriteArrayList<>(user.getVisitedLocations());
 			List<Attraction> attractions = gpsUtil.getAttractions();
 
-			for(VisitedLocation visitedLocation : userLocations) {
-				for (Attraction attraction : attractions) {
-					if (user.getUserRewards().stream().noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName))) {
-						if (nearAttraction(visitedLocation, attraction)) {
-							user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
-						}
-					}
-				}
-			}
+			userLocations.forEach(visitedLocation -> {
+				attractions.stream()
+						.filter(attraction -> user.getUserRewards().stream()
+								.noneMatch(r -> r.attraction.attractionName.equals(attraction.attractionName)))
+						.filter(attraction -> nearAttraction(visitedLocation, attraction))
+						.forEach(attraction -> user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user))));
+			});
 		});
 	}
 	
