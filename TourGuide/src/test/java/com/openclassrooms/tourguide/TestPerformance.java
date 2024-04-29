@@ -9,11 +9,13 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.Test;
+import org.springframework.scheduling.annotation.Async;
 import rewardCentral.RewardCentral;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -60,6 +62,7 @@ public class TestPerformance {
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+
 		for (User user : allUsers) {
 			tourGuideService.trackUserLocation(user);
 			visitedLocationFutures.add(tourGuideService.trackUserLocation(user));
@@ -97,7 +100,7 @@ public class TestPerformance {
 		List<User> allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-		List<Future<?>> listRewardsFuture = new ArrayList<>();
+		List<Future<?>> listRewardsFuture = new CopyOnWriteArrayList<>();
 
 		allUsers.forEach(u -> listRewardsFuture.add(rewardsService.calculateRewards(u)));
 
